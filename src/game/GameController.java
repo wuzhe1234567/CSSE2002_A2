@@ -3,6 +3,7 @@ package game;
 import game.achievements.Achievement;
 import game.achievements.AchievementManager;
 import game.achievements.PlayerStatsTracker;
+import game.core.Direction;
 import java.util.List;
 
 public class GameController {
@@ -43,17 +44,16 @@ public class GameController {
     private void handlePlayerInput(String key) {
         switch (key) {
             case "LEFT":
-                model.getShip().move(-1);
+                model.getShip().move(Direction.LEFT);
                 break;
             case "RIGHT":
-                model.getShip().move(1);
+                model.getShip().move(Direction.RIGHT);
                 break;
             case "SPACE":
                 model.fireBullet();
                 break;
             default:
                 // ignore other keys
-                break;
         }
     }
 
@@ -80,18 +80,18 @@ public class GameController {
         sb.append("Shots Fired: ").append(stats.getShotsFired()).append("\n");
         sb.append("Shots Hit: ").append(stats.getShotsHit()).append("\n");
         sb.append("Enemies Destroyed: ").append(stats.getEnemiesDestroyed()).append("\n");
-        sb.append("Survival Time: ").append(stats.getElapsedSeconds()).append(" seconds\n");
+        sb.append("Survival Time: ").append(stats.getElapsedSeconds())
+          .append(" seconds\n");
         ui.showText(sb.toString());
 
         List<Achievement> achievements = aManager.getAchievements();
         for (Achievement ach : achievements) {
             double pct = ach.getProgress() * 100;
-            ui.showText(
-                String.format(
-                    "%s: %s (Tier %d) - %.1f%% complete",
-                    ach.getName(), ach.getDescription(), ach.getCurrentTier(), pct
-                )
-            );
+            ui.showText(String.format(
+                "%s: %s (Tier %d) - %.1f%% complete",
+                ach.getName(), ach.getDescription(),
+                ach.getCurrentTier(), pct
+            ));
         }
     }
 }
