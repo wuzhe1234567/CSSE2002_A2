@@ -15,21 +15,19 @@ public interface SpaceObject extends Tickable {
      */
     ObjectGraphic render();
 
-    // Methods for positional awareness
     /**
-     * Returns the x coordinate of the SpaceObject,
-     * where 0 represents the left-most space with positive numbers extending to the right.
+     * Returns the x coordinate of the SpaceObject, where 0 represents the left-most space
+     * with positive numbers extending to the right.
      *
      * @return x coordinate of the SpaceObject.
      */
     int getX();
 
     /**
-     * Returns the y coordinate of the SpaceObject,
-     * where 0 represents the top-most space with positive numbers extending downwards.
+     * Returns the y coordinate of the SpaceObject, where 0 represents the top-most space
+     * with positive numbers extending downwards.
      *
      * @return y coordinate of the SpaceObject.
      */
     int getY();
 }
-
