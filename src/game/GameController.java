@@ -3,7 +3,7 @@ package game;
 import game.achievements.Achievement;
 import game.achievements.AchievementManager;
 import game.achievements.PlayerStatsTracker;
-import game.Direction;
+// ← no import of Direction any more
 import java.util.List;
 
 public class GameController {
@@ -44,16 +44,16 @@ public class GameController {
     private void handlePlayerInput(String key) {
         switch (key) {
             case "LEFT":
-                model.getShip().move(Direction.LEFT);
+                model.getShip().move(-1);
                 break;
             case "RIGHT":
-                model.getShip().move(Direction.RIGHT);
+                model.getShip().move(1);
                 break;
             case "SPACE":
                 model.fireBullet();
                 break;
             default:
-                // ignore other keys
+                // ignore
         }
     }
 
