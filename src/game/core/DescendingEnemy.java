@@ -18,12 +18,13 @@ public abstract class DescendingEnemy extends ObjectWithPosition {
     /**
      * Moves the DescendingEnemy downwards by one if the given tick is a multiple of 10.
      *
-     * @param tick the given game tick
+     * @param tick the given game tick.
      */
     @Override
     public void tick(int tick) {
         if (tick % 10 == 0) {
-            y++; // Move downward
+            y++;
         }
     }
 }
+
