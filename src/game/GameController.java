@@ -31,9 +31,9 @@ public class GameController {
         int tick = 0;
         while (!isPaused) {
             tick++;
-            model.updateGame(tick);                // renamed from updateState
+            model.updateGame(tick);
             refreshAchievements(tick);
-            renderGame();                         
+            renderGame();
             if (model.checkGameOver()) {
                 pauseGame();
             }
@@ -42,10 +42,18 @@ public class GameController {
 
     private void handlePlayerInput(String key) {
         switch (key) {
-            case "LEFT":  model.getShip().move(-1); break;
-            case "RIGHT": model.getShip().move(1);  break;
-            case "SPACE": model.fireBullet();        break;
-            default: /* ignore other keys */         break;
+            case "LEFT":
+                model.getShip().move(-1);
+                break;
+            case "RIGHT":
+                model.getShip().move(1);
+                break;
+            case "SPACE":
+                model.fireBullet();
+                break;
+            default:
+                // ignore other keys
+                break;
         }
     }
 
@@ -54,16 +62,16 @@ public class GameController {
     }
 
     private void renderGame() {
-        ui.render(model);                     // pass model as frame
+        ui.render(model);
     }
 
     private void pauseGame() {
         isPaused = true;
-        ui.showGameOver(model.getShip().getScore());  // ship score
+        ui.showGameOver(model.getShip().getScore());
     }
 
     public PlayerStatsTracker getStatsTracker() {
-        return model.getStatsTracker();          // renamed method
+        return model.getStatsTracker();
     }
 
     public void showStats() {
@@ -78,8 +86,12 @@ public class GameController {
         List<Achievement> achievements = aManager.getAchievements();
         for (Achievement ach : achievements) {
             double pct = ach.getProgress() * 100;
-            ui.showText(String.format(
-                "%s: %s (Tier %d) - %.1f%% complete",
-                ach.getName(), ach.getDescription(), ach.getCurrentTier(), pct
-            ));
+            ui.showText(
+                String.format(
+                    "%s: %s (Tier %d) - %.1f%% complete",
+                    ach.getName(), ach.getDescription(), ach.getCurrentTier(), pct
+                )
+            );
         }
+    }
+}
