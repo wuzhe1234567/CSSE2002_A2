@@ -3,7 +3,6 @@ package game;
 import game.achievements.Achievement;
 import game.achievements.AchievementManager;
 import game.achievements.PlayerStatsTracker;
-// ← no import of Direction any more
 import java.util.List;
 
 public class GameController {
@@ -33,10 +32,11 @@ public class GameController {
         while (!isPaused) {
             tick++;
             model.updateGame(tick);
-            refreshAchievements(tick);
-            renderGame();
+            aManager.updateAll(model, tick);
+            ui.render(model);
             if (model.checkGameOver()) {
-                pauseGame();
+                isPaused = true;
+                ui.showGameOver(model.getShip().getScore());
             }
         }
     }
@@ -53,24 +53,12 @@ public class GameController {
                 model.fireBullet();
                 break;
             default:
-                // ignore
+                // ignore other keys
         }
     }
 
-    private void refreshAchievements(int tick) {
-        aManager.updateAll(model, tick);
-    }
-
-    private void renderGame() {
-        ui.render(model);
-    }
-
-    private void pauseGame() {
-        isPaused = true;
-        ui.showGameOver(model.getShip().getScore());
-    }
-
     public PlayerStatsTracker getStatsTracker() {
+        // 修成 match GameModel 中真实的方法名，若你的 GameModel 中是 getStats()，请改成 model.getStats()
         return model.getStatsTracker();
     }
 
@@ -84,7 +72,8 @@ public class GameController {
           .append(" seconds\n");
         ui.showText(sb.toString());
 
-        for (Achievement ach : aManager.getAchievements()) {
+        List<Achievement> achievements = aManager.getAchievements();
+        for (Achievement ach : achievements) {
             double pct = ach.getProgress() * 100;
             ui.showText(String.format(
                 "%s: %s (Tier %d) - %.1f%% complete",
