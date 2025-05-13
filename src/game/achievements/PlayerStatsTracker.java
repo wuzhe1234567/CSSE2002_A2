@@ -1,15 +1,31 @@
 package game.achievements;
 
 public class PlayerStatsTracker {
-    private int shotsFired = 0;
-    private int shotsHit = 0;
-    private int enemiesDestroyed = 0;
-    private long startTime = System.currentTimeMillis();
+    private int shotsFired;
+    private int shotsHit;
+    private int enemiesDestroyed;
+    private final long startTime;
 
-    public void recordAction(String action) {
-        // TODO: 根据 action 类型更新统计
-        if ("fire".equals(action)) shotsFired++;
-        if ("hit".equals(action)) shotsHit++;
+    public PlayerStatsTracker() {
+        this.shotsFired = 0;
+        this.shotsHit = 0;
+        this.enemiesDestroyed = 0;
+        this.startTime = System.currentTimeMillis();
+    }
+
+    /**
+     * Records a shot fired by the player.
+     */
+    public void recordShotFired() {
+        shotsFired++;
+    }
+
+    /**
+     * Records a successful hit on an enemy.
+     */
+    public void recordShotHit() {
+        shotsHit++;
+        enemiesDestroyed++;
     }
 
     public int getShotsFired() {
@@ -24,6 +40,9 @@ public class PlayerStatsTracker {
         return enemiesDestroyed;
     }
 
+    /**
+     * Returns elapsed seconds since tracker creation.
+     */
     public long getElapsedSeconds() {
         return (System.currentTimeMillis() - startTime) / 1000;
     }
