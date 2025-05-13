@@ -5,7 +5,7 @@ import game.core.Bullet;
 import game.core.Enemy;
 import game.core.HealthPowerUp;
 import game.core.PowerUp;
-import game.core.Se'ieldPowerUp;
+import game.core.ShieldPowerUp;
 import game.core.Ship;
 import game.core.SpaceObject;
 import game.achievements.PlayerStatsTracker;
@@ -259,3 +259,4 @@ public class GameModel {
         return "GameModel[level=" + level + ", spawnRate=" + spawnRate + "]";
     }
 }
+
