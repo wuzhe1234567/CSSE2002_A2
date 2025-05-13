@@ -1,42 +1,71 @@
 package game.achievements;
 
+/**
+ * Represents a tracker for player statistics.
+ * Monitors shots fired and hits, and computes accuracy & elapsed time.
+ */
 public class PlayerStatsTracker {
+    private final long startTime;
     private int shotsFired;
     private int shotsHit;
-    private int enemiesDestroyed;
-    private final long startTime;
 
+    /**
+     * Constructs with current system time (ms) as the start.
+     */
     public PlayerStatsTracker() {
-        this.shotsFired = 0;
-        this.shotsHit = 0;
-        this.enemiesDestroyed = 0;
-        this.startTime = System.currentTimeMillis();
+        this(System.currentTimeMillis());
     }
 
-    /** 记录一次开火 */
+    /**
+     * Constructs with a custom start time.
+     *
+     * @param startTime the time when the tracking began
+     */
+    public PlayerStatsTracker(long startTime) {
+        this.startTime = startTime;
+        this.shotsFired = 0;
+        this.shotsHit = 0;
+    }
+
+    /**
+     * Records the player firing one shot.
+     */
     public void recordShotFired() {
         shotsFired++;
     }
 
-    /** 记录一次命中并计为消灭一个敌人 */
+    /**
+     * Records the player hitting one target.
+     */
     public void recordShotHit() {
         shotsHit++;
-        enemiesDestroyed++;
     }
 
+    /**
+     * Returns the total number of shots the player has fired.
+     */
     public int getShotsFired() {
         return shotsFired;
     }
 
+    /**
+     * Returns the total number of shots the player has successfully hit.
+     */
     public int getShotsHit() {
         return shotsHit;
     }
 
-    public int getEnemiesDestroyed() {
-        return enemiesDestroyed;
+    /**
+     * Returns the shooting accuracy percentage as a decimal.
+     * Accuracy = shotsHit / shotsFired, or 0.0 if no shots fired.
+     */
+    public double getAccuracy() {
+        return shotsFired == 0 ? 0.0 : (double) shotsHit / shotsFired;
     }
 
-    /** 返回从游戏开始到现在经过的秒数 */
+    /**
+     * Returns the number of seconds elapsed since the tracker started.
+     */
     public long getElapsedSeconds() {
         return (System.currentTimeMillis() - startTime) / 1000;
     }
