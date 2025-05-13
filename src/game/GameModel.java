@@ -144,33 +144,33 @@ public class GameModel {
      * Uses this.random to make EXACTLY 6 calls to random.nextInt() and 1 random.nextBoolean().
      */
     public void spawnObjects() {
-        // 1. Asteroid spawn check
-        int roll1 = random.nextInt(100);
-        // 2. Asteroid x position
-        int x1 = random.nextInt(GAME_WIDTH);
-        if (roll1 < spawnRate && !collidesWithShipOrObject(x1, 0)) {
-            spaceObjects.add(new Asteroid(x1, 0));
-        }
-        // 3. Enemy spawn check
-        int roll2 = random.nextInt(100);
-        // 4. Enemy x position
-        int x2 = random.nextInt(GAME_WIDTH);
-        if (roll2 < spawnRate * ENEMY_SPAWN_RATE && !collidesWithShipOrObject(x2, 0)) {
-            spaceObjects.add(new Enemy(x2, 0));
-        }
-        // 5. PowerUp spawn check
-        int roll3 = random.nextInt(100);
-        // 6. PowerUp x position
-        int x3 = random.nextInt(GAME_WIDTH);
-        boolean spawnPU = roll3 < spawnRate * POWER_UP_SPAWN_RATE;
-        // 7. PowerUp type
-        boolean kind = random.nextBoolean();
-        if (spawnPU && !collidesWithShipOrObject(x3, 0)) {
-            spaceObjects.add(kind
-                ? new ShieldPowerUp(x3, 0)
-                : new HealthPowerUp(x3, 0));
-        }
+    // 1. Asteroid spawn check
+    int roll1 = random.nextInt(100);
+    // 2. Asteroid x position
+    int x1 = random.nextInt(GAME_WIDTH);
+    if (roll1 < spawnRate && !collidesWithShipOrObject(x1, 0)) {
+        spaceObjects.add(new Asteroid(x1, 0));
     }
+    // 3. Enemy spawn check
+    int roll2 = random.nextInt(100);
+    // 4. Enemy x position
+    int x2 = random.nextInt(GAME_WIDTH);
+    if (roll2 < spawnRate * ENEMY_SPAWN_RATE && !collidesWithShipOrObject(x2, 0)) {
+        spaceObjects.add(new Enemy(x2, 0));
+    }
+    // 5. PowerUp spawn check
+    int roll3 = random.nextInt(100);
+    // 6. PowerUp x position
+    int x3 = random.nextInt(GAME_WIDTH);
+    boolean spawnPU = roll3 < spawnRate * POWER_UP_SPAWN_RATE;
+    // 7. PowerUp type
+    boolean kind = random.nextBoolean();
+    if (spawnPU && !collidesWithShipOrObject(x3, 0)) {
+        spaceObjects.add(kind
+            ? new ShieldPowerUp(x3, 0)
+            : new HealthPowerUp(x3, 0));
+    }
+}
 
     // Helper to prevent spawning on ship or existing objects
     private boolean collidesWithShipOrObject(int x, int y) {
