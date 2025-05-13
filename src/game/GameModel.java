@@ -19,6 +19,47 @@ import java.util.Random;
  * Represents the game information and state. Stores and manipulates the game state.
  */
 public class GameModel {
+    // ... existing fields and constructor ...
+
+    /**
+     * Exposed for controller: updates state by delegating to updateGame
+     */
+    public void updateState(int tick) {
+        updateGame(tick);
+    }
+
+    /**
+     * Exposed for controller: processes player input
+     */
+    public void processInput(String key) {
+        // Example: handle fire command
+        if ("fire".equalsIgnoreCase(key)) {
+            fireBullet();
+            statsTracker.recordShotFired();
+        }
+        logger.log("Input: " + key);
+    }
+
+    /**
+     * Exposed for controller: returns current frame data
+     */
+    public Object getCurrentFrame() {
+        return new ArrayList<>(spaceObjects);
+    }
+
+    /**
+     * Exposed for controller: returns current score
+     */
+    public int getScore() {
+        return ship.getScore();
+    }
+
+    /**
+     * Exposed for controller: returns stats tracker
+     */
+    public PlayerStatsTracker getStats() {
+        return statsTracker;
+    }
     public static final int GAME_HEIGHT = 20;
     public static final int GAME_WIDTH = 10;
     public static final int START_SPAWN_RATE = 2;
