@@ -3,8 +3,6 @@ package game;
 import game.achievements.Achievement;
 import game.achievements.AchievementManager;
 import game.achievements.PlayerStatsTracker;
-import game.core.Healable;
-import game.core.HealthPowerUp;
 import java.util.List;
 
 public class GameController {
@@ -33,9 +31,9 @@ public class GameController {
         int tick = 0;
         while (!isPaused) {
             tick++;
-            model.updateState(tick);
+            model.updateGame(tick);               // use updateGame()
             refreshAchievements(tick);
-            renderGame();
+            renderGame();                         
             if (model.checkGameOver()) {
                 pauseGame();
             }
@@ -43,7 +41,12 @@ public class GameController {
     }
 
     private void handlePlayerInput(String key) {
-        model.processInput(key);
+        switch (key) {
+            case "LEFT":  model.getShip().move(-1); break;
+            case "RIGHT": model.getShip().move(1);  break;
+            case "SPACE": model.fireBullet();        break;
+            default: /* ignore other keys */         break;
+        }
     }
 
     private void refreshAchievements(int tick) {
@@ -51,16 +54,16 @@ public class GameController {
     }
 
     private void renderGame() {
-        ui.render(model.getCurrentFrame());
+        ui.render(model.getShip(), model.getSpaceObjects());
     }
 
     private void pauseGame() {
         isPaused = true;
-        ui.showGameOver(model.getScore());
+        ui.showGameOver(model.getShip().getScore());
     }
 
     public PlayerStatsTracker getStatsTracker() {
-        return model.getStats();
+        return model.getStatsTracker();           // renamed
     }
 
     public void showStats() {
@@ -71,11 +74,14 @@ public class GameController {
         sb.append("Enemies Destroyed: ").append(stats.getEnemiesDestroyed()).append("\n");
         sb.append("Survival Time: ").append(stats.getElapsedSeconds()).append(" seconds\n");
         ui.showText(sb.toString());
+
         List<Achievement> achievements = aManager.getAchievements();
         for (Achievement ach : achievements) {
-            double progressPercent = ach.getProgress() * 100;
-            ui.showText(String.format("%s: %s (Tier %d) - %.1f%% complete",
-                    ach.getName(), ach.getDescription(), ach.getCurrentTier(), progressPercent));
+            double pct = ach.getProgress() * 100;
+            ui.showText(String.format(
+                "%s: %s (Tier %d) - %.1f%% complete",
+                ach.getName(), ach.getDescription(), ach.getCurrentTier(), pct
+            ));
         }
     }
 }
