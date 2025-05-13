@@ -58,18 +58,13 @@ public class GameModel {
         this.ship = new Ship();
     }
 
-    /**
-     * Exposed for controller: updates state by delegating to updateGame
-     */
+    /** Exposed for controller: updates state by delegating to updateGame */
     public void updateState(int tick) {
         updateGame(tick);
     }
 
-    /**
-     * Exposed for controller: processes player input
-     */
+    /** Exposed for controller: processes player input */
     public void processInput(String key) {
-        // Example: handle fire command
         if ("fire".equalsIgnoreCase(key)) {
             fireBullet();
             statsTracker.recordShotFired();
@@ -77,23 +72,17 @@ public class GameModel {
         logger.log("Input: " + key);
     }
 
-    /**
-     * Exposed for controller: returns current frame data
-     */
+    /** Exposed for controller: returns current frame data */
     public Object getCurrentFrame() {
         return new ArrayList<>(spaceObjects);
     }
 
-    /**
-     * Exposed for controller: returns current score
-     */
+    /** Exposed for controller: returns current score */
     public int getScore() {
         return ship.getScore();
     }
 
-    /**
-     * Exposed for controller: returns stats tracker
-     */
+    /** Exposed for controller: returns stats tracker */
     public PlayerStatsTracker getStats() {
         return statsTracker;
     }
@@ -167,26 +156,26 @@ public class GameModel {
 
     /**
      * Spawns new objects (Asteroids, Enemies, and PowerUps) at random positions.
-     * Uses this.random to make EXACTLY 6 calls to random.nextInt() and 1 random.nextBoolean.
+     * Uses this.random to make EXACTLY 6 calls to random.nextInt() and 1 call to random.nextBoolean().
      */
     public void spawnObjects() {
         // 1. Asteroid spawn check
         int roll1 = random.nextInt(100);
-        // 2. Asteroid spawn position
+        // 2. Asteroid x position
         int x1 = random.nextInt(GAME_WIDTH);
         if (roll1 < spawnRate && !collidesWithShipOrObject(x1, 0)) {
             spaceObjects.add(new Asteroid(x1, 0));
         }
         // 3. Enemy spawn check
         int roll2 = random.nextInt(100);
-        // 4. Enemy spawn position
+        // 4. Enemy x position
         int x2 = random.nextInt(GAME_WIDTH);
         if (roll2 < spawnRate * ENEMY_SPAWN_RATE && !collidesWithShipOrObject(x2, 0)) {
             spaceObjects.add(new Enemy(x2, 0));
         }
         // 5. PowerUp spawn check
         int roll3 = random.nextInt(100);
-        // 6. PowerUp spawn position
+        // 6. PowerUp x position
         int x3 = random.nextInt(GAME_WIDTH);
         boolean spawnPU = roll3 < spawnRate * POWER_UP_SPAWN_RATE;
         // 7. PowerUp type
@@ -196,6 +185,7 @@ public class GameModel {
         }
     }
 
+    // Prevent spawning on ship or existing objects
     private boolean collidesWithShipOrObject(int x, int y) {
         if (ship.getX() == x && ship.getY() == y) return true;
         for (SpaceObject obj : spaceObjects) {
@@ -245,14 +235,16 @@ public class GameModel {
     }
 
     /**
-     * If level progression requirements are satisfied, levels up the game by increasing the spawn rate and level number.
+     * If level progression requirements are satisfied, levels up the game by increasing
+     * the spawn rate and level number.
      */
     public void levelUp() {
         if (ship.getScore() >= level * SCORE_THRESHOLD) {
             level++;
             spawnRate += SPAWN_RATE_INCREASE;
             if (verbose) {
-                logger.log("Level Up! Welcome to Level " + level + ". Spawn rate increased to " + spawnRate + "%.");
+                logger.log("Level Up! Welcome to Level " + level +
+                           ". Spawn rate increased to " + spawnRate + "%.");
             }
         }
     }
@@ -288,7 +280,9 @@ public class GameModel {
      * @requires spaceObject != null
      */
     public static boolean isInBounds(SpaceObject spaceObject) {
-        if (spaceObject == null) throw new IllegalArgumentException("spaceObject must not be null");
+        if (spaceObject == null) {
+            throw new IllegalArgumentException("spaceObject must not be null");
+        }
         int x = spaceObject.getX();
         int y = spaceObject.getY();
         return x >= 0 && x < GAME_WIDTH && y >= 0 && y < GAME_HEIGHT;
