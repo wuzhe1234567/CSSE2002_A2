@@ -77,3 +77,4 @@ public class AchievementManager {
         return new ArrayList<>(achievements);
     }
 }
+
