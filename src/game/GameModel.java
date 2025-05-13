@@ -1,3 +1,4 @@
+// File: src/game/GameModel.java
 package game;
 
 import game.core.Asteroid;
@@ -42,7 +43,7 @@ public class GameModel {
     /**
      * Models a game, storing and modifying data relevant to the game.
      *
-     * @param logger      a functional interface for passing information between classes.
+     * @param logger       a functional interface for passing information between classes.
      * @param statsTracker a PlayerStatsTracker instance to record stats.
      * @requires logger != null, statsTracker != null
      */
@@ -87,38 +88,22 @@ public class GameModel {
         return statsTracker;
     }
 
-    /**
-     * Returns the ship instance in the game.
-     *
-     * @return the current ship instance.
-     */
+    /** Returns the ship instance in the game. */
     public Ship getShip() {
         return ship;
     }
 
-    /**
-     * Returns a list of all SpaceObjects in the game.
-     *
-     * @return a list of all spaceObjects.
-     */
+    /** Returns a list of all SpaceObjects in the game. */
     public List<SpaceObject> getSpaceObjects() {
         return new ArrayList<>(spaceObjects);
     }
 
-    /**
-     * Returns the current level.
-     *
-     * @return the current level.
-     */
+    /** Returns the current level. */
     public int getLevel() {
         return level;
     }
 
-    /**
-     * Returns the current player stats tracker.
-     *
-     * @return the current player stats tracker.
-     */
+    /** Returns the current player stats tracker. */
     public PlayerStatsTracker getStatsTracker() {
         return statsTracker;
     }
@@ -156,7 +141,7 @@ public class GameModel {
 
     /**
      * Spawns new objects (Asteroids, Enemies, and PowerUps) at random positions.
-     * Uses this.random to make EXACTLY 6 calls to random.nextInt() and 1 call to random.nextBoolean().
+     * Uses this.random to make EXACTLY 6 calls to random.nextInt() and 1 random.nextBoolean().
      */
     public void spawnObjects() {
         // 1. Asteroid spawn check
@@ -181,11 +166,13 @@ public class GameModel {
         // 7. PowerUp type
         boolean kind = random.nextBoolean();
         if (spawnPU && !collidesWithShipOrObject(x3, 0)) {
-            spaceObjects.add(kind ? new ShieldPowerUp(x3, 0) : new HealthPowerUp(x3, 0));
+            spaceObjects.add(kind
+                ? new ShieldPowerUp(x3, 0)
+                : new HealthPowerUp(x3, 0));
         }
     }
 
-    // Prevent spawning on ship or existing objects
+    // Helper to prevent spawning on ship or existing objects
     private boolean collidesWithShipOrObject(int x, int y) {
         if (ship.getX() == x && ship.getY() == y) return true;
         for (SpaceObject obj : spaceObjects) {
@@ -194,14 +181,15 @@ public class GameModel {
         return false;
     }
 
-    /**
-     * Detects and handles collisions between spaceObjects (Ship and Bullet collisions).
-     */
+    /** Detects and handles collisions between spaceObjects. */
     public void checkCollisions() {
         List<SpaceObject> toRemove = new ArrayList<>();
         // Ship collisions
         for (SpaceObject obj : new ArrayList<>(spaceObjects)) {
-            if (!(obj instanceof Bullet) && ship.getX() == obj.getX() && ship.getY() == obj.getY()) {
+            if (!(obj instanceof Bullet)
+                && ship.getX() == obj.getX()
+                && ship.getY() == obj.getY()) {
+
                 if (obj instanceof PowerUp) {
                     ((PowerUp) obj).applyEffect(ship);
                     if (verbose) logger.log("PowerUp collected: " + obj.render());
@@ -219,12 +207,16 @@ public class GameModel {
         for (SpaceObject obj : new ArrayList<>(spaceObjects)) {
             if (obj instanceof Bullet) {
                 for (SpaceObject other : spaceObjects) {
-                    if (other instanceof Enemy && obj.getX() == other.getX() && obj.getY() == other.getY()) {
+                    if (other instanceof Enemy
+                        && obj.getX() == other.getX()
+                        && obj.getY() == other.getY()) {
                         toRemove.add(obj);
                         toRemove.add(other);
                         statsTracker.recordShotHit();
                         break;
-                    } else if (other instanceof Asteroid && obj.getX() == other.getX() && obj.getY() == other.getY()) {
+                    } else if (other instanceof Asteroid
+                        && obj.getX() == other.getX()
+                        && obj.getY() == other.getY()) {
                         toRemove.add(obj);
                         break;
                     }
@@ -249,16 +241,12 @@ public class GameModel {
         }
     }
 
-    /**
-     * Fires a Bullet from the ship's current position.
-     */
+    /** Fires a Bullet from the ship's current position. */
     public void fireBullet() {
         spaceObjects.add(new Bullet(ship.getX(), ship.getY()));
     }
 
-    /**
-     * Sets the seed of the Random instance created in the constructor using .setSeed().
-     */
+    /** Sets the seed of the Random instance. */
     public void setRandomSeed(int seed) {
         random.setSeed(seed);
     }
@@ -288,12 +276,9 @@ public class GameModel {
         return x >= 0 && x < GAME_WIDTH && y >= 0 && y < GAME_HEIGHT;
     }
 
-    /**
-     * Sets verbose state to the provided input.
-     *
-     * @param verbose whether to set verbose state to true or false.
-     */
+    /** Sets verbose state to the provided input. */
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
 }
+
