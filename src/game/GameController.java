@@ -58,8 +58,8 @@ public class GameController {
     }
 
     public PlayerStatsTracker getStatsTracker() {
-        // 修成 match GameModel 中真实的方法名，若你的 GameModel 中是 getStats()，请改成 model.getStats()
-        return model.getStatsTracker();
+        // GameModel provides getStats(), not getStatsTracker()
+        return model.getStats();
     }
 
     public void showStats() {
@@ -68,8 +68,7 @@ public class GameController {
         sb.append("Shots Fired: ").append(stats.getShotsFired()).append("\n");
         sb.append("Shots Hit: ").append(stats.getShotsHit()).append("\n");
         sb.append("Enemies Destroyed: ").append(stats.getEnemiesDestroyed()).append("\n");
-        sb.append("Survival Time: ").append(stats.getElapsedSeconds())
-          .append(" seconds\n");
+        sb.append("Survival Time: ").append(stats.getElapsedSeconds()).append(" seconds\n");
         ui.showText(sb.toString());
 
         List<Achievement> achievements = aManager.getAchievements();
@@ -77,8 +76,7 @@ public class GameController {
             double pct = ach.getProgress() * 100;
             ui.showText(String.format(
                 "%s: %s (Tier %d) - %.1f%% complete",
-                ach.getName(), ach.getDescription(),
-                ach.getCurrentTier(), pct
+                ach.getName(), ach.getDescription(), ach.getCurrentTier(), pct
             ));
         }
     }
