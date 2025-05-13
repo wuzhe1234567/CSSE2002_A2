@@ -6,7 +6,6 @@ import game.ui.ObjectGraphic;
  * Represents a shield PowerUp in the game.
  */
 public class ShieldPowerUp extends PowerUp {
-
     /**
      * Creates a new ShieldPowerUp with the given coordinates.
      *
@@ -19,11 +18,10 @@ public class ShieldPowerUp extends PowerUp {
 
     /**
      * Returns a new ObjectGraphic with the appropriate text representation and image path.
-     *
      * The text representation is "💠".
      * The image path is "assets/shield.png".
      *
-     * @return the appropriate new ObjectGraphic
+     * @return the appropriate new ObjectGraphic.
      */
     @Override
     public ObjectGraphic render() {
@@ -37,10 +35,8 @@ public class ShieldPowerUp extends PowerUp {
      */
     @Override
     public void applyEffect(Ship ship) {
-        applyScore(ship);
-    }
-
-    private void applyScore(Ship target) {
-        target.addScore(50);
+        ship.addScore(50);
     }
 }
+
+
