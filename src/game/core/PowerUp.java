@@ -16,9 +16,9 @@ public abstract class PowerUp extends ObjectWithPosition implements PowerUpEffec
     }
 
     /**
-     *Moves PowerUp downwards, once every 10 game ticks.
+     * Moves PowerUp downwards, once every 10 game ticks.
      *
-     * @param tick the given game tick
+     * @param tick the given game tick.
      */
     @Override
     public void tick(int tick) {
@@ -27,3 +27,4 @@ public abstract class PowerUp extends ObjectWithPosition implements PowerUpEffec
         }
     }
 }
+
