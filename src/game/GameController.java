@@ -1,5 +1,4 @@
-// src/game/core/Controllable.java
-package game.core;
+package game;
 
 import game.GameModel;
 
