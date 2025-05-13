@@ -3,7 +3,7 @@ package game;
 import game.achievements.Achievement;
 import game.achievements.AchievementManager;
 import game.achievements.PlayerStatsTracker;
-import game.Direction;                      // ← 正确的 Direction 枚举包路径
+import game.Direction;
 import java.util.List;
 
 public class GameController {
@@ -84,8 +84,7 @@ public class GameController {
           .append(" seconds\n");
         ui.showText(sb.toString());
 
-        List<Achievement> achievements = aManager.getAchievements();
-        for (Achievement ach : achievements) {
+        for (Achievement ach : aManager.getAchievements()) {
             double pct = ach.getProgress() * 100;
             ui.showText(String.format(
                 "%s: %s (Tier %d) - %.1f%% complete",
