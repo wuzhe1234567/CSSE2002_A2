@@ -11,4 +11,3 @@ public interface PowerUpEffect {
      */
     void applyEffect(Ship ship);
 }
-
