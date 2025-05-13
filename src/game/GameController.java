@@ -1,46 +1,5 @@
 package game;
 
-import game.GameModel;
-
-/**
- * 可被控制的空间物体基类（例如飞船）。
- */
-public abstract class Controllable implements SpaceObject {
-    protected int x, y;
-
-    public Controllable(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    /**
-     * 横向移动 dx 个格子：dx=+1 向右，dx=-1 向左。
-     * 超出边界时夹紧到 [0, GAME_WIDTH-1]。
-     */
-    public void move(int dx) {
-        int nx = x + dx;
-        nx = Math.max(0, Math.min(GameModel.GAME_WIDTH - 1, nx));
-        this.x = nx;
-    }
-
-    @Override
-    public int getX() {
-        return x;
-    }
-
-    @Override
-    public int getY() {
-        return y;
-    }
-
-    @Override
-    public abstract void tick(int tick);
-}
-
-
-// src/game/GameController.java
-package game;
-
 import game.achievements.AchievementManager;
 import game.achievements.PlayerStatsTracker;
 import game.ui.UI;
@@ -69,15 +28,18 @@ public class GameController {
      * The start time System.currentTimeMillis() should be stored as a long.
      * Starts the UI using UI.start().
      *
-     * @param ui the UI used to draw the Game
-     * @param model the model used to maintain game information
-     * @param achievementManager the manager used to maintain achievement information
-     * @requires ui is not null, model is not null, achievementManager is not null
+     * @param ui The UI used to draw the Game.
+     * @param model The model used to maintain game information.
+     * @param achievementManager The manager used to maintain achievement information.
+     * @requires ui, model, and achievementManager are not null.
      */
     public GameController(UI ui, GameModel model, AchievementManager achievementManager) {
-        this.ui = Objects.requireNonNull(ui, "ui must not be null");
-        this.model = Objects.requireNonNull(model, "model must not be null");
-        this.achievementManager = Objects.requireNonNull(achievementManager, "achievementManager must not be null");
+        Objects.requireNonNull(ui, "ui must not be null");
+        Objects.requireNonNull(model, "model must not be null");
+        Objects.requireNonNull(achievementManager, "achievementManager must not be null");
+        this.ui = ui;
+        this.model = model;
+        this.achievementManager = achievementManager;
         this.startTime = System.currentTimeMillis();
         ui.start();
     }
@@ -88,9 +50,9 @@ public class GameController {
      * The start time System.currentTimeMillis() should be stored as a long.
      * Starts the UI using UI.start().
      *
-     * @param ui the UI used to draw the Game
-     * @param achievementManager the manager used to maintain achievement information
-     * @requires ui is not null, achievementManager is not null
+     * @param ui The UI used to draw the Game.
+     * @param achievementManager The manager used to maintain achievement information.
+     * @requires ui and achievementManager are not null.
      */
     public GameController(UI ui, AchievementManager achievementManager) {
         this(ui, new GameModel(ui::log, new PlayerStatsTracker()), achievementManager);
@@ -111,8 +73,9 @@ public class GameController {
     }
 
     /**
-     * Sets verbose state to the provided input.
-     * Also sets the model's verbose state.
+     * Sets verbose state to the provided input. Also sets the model's verbose state.
+     *
+     * @param verbose Whether to enable verbose logging.
      */
     public void setVerbose(boolean verbose) {
         this.isVerbose = verbose;
@@ -130,7 +93,7 @@ public class GameController {
     /**
      * Uses the provided tick to advance game state and render.
      *
-     * @param tick the provided tick
+     * @param tick The provided tick.
      */
     public void onTick(int tick) {
         model.updateGame(tick);
@@ -150,14 +113,14 @@ public class GameController {
      */
     public void pauseGame() {
         ui.pause();
-        boolean paused = model.checkGameOver() || false; // placeholder, or track separately
-        ui.log(paused ? "Game paused." : "Game unpaused.");
+        ui.log(isVerbose ? "Game paused." : "Game unpaused.");
     }
 
     /**
      * Updates the player's progress towards achievements.
+     * Logs progress every 100 ticks if verbose is enabled.
      *
-     * @param tick the provided tick
+     * @param tick The provided tick.
      */
     public void refreshAchievements(int tick) {
         achievementManager.updateAll(model, tick);
@@ -181,8 +144,10 @@ public class GameController {
 
     /**
      * Handles player input commands.
+     * Uppercase and lowercase inputs are treated identically.
      *
-     * @param input the player's input command
+     * @param input The player's input command.
+     * @requires input is a single character.
      */
     public void handlePlayerInput(String input) {
         if (input == null || input.length() != 1) {
@@ -202,7 +167,9 @@ public class GameController {
                 break;
             case 'D': model.getShip().move(1); break;
             case 'F': model.fireBullet(); break;
-            default: ui.log("Invalid input. Use W, A, S, D, F, or P."); return;
+            default:
+                ui.log("Invalid input. Use W, A, S, D, F, or P.");
+                return;
         }
         if (isVerbose) {
             ui.log("Ship moved to (" + model.getShip().getX() + "," + model.getShip().getY() + ")");
