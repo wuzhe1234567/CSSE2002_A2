@@ -3,7 +3,7 @@ package game;
 import game.achievements.Achievement;
 import game.achievements.AchievementManager;
 import game.achievements.PlayerStatsTracker;
-import game.core.GameModel;
+import game.GameModel;
 import game.core.SpaceObject;
 import java.util.List;
 import java.util.Objects;
