@@ -3,12 +3,12 @@ package game.core;
 import game.ui.ObjectGraphic;
 
 /**
- * Represents an enemy UFO in the game.
+ * Represents an Enemy UFO in the game.
  */
 public class Enemy extends DescendingEnemy {
 
     /**
-     * Creates an enemy at the given coordinate.
+     * Creates an Enemy at the given coordinate.
      *
      * @param x the given x coordinate
      * @param y the given y coordinate
@@ -19,11 +19,10 @@ public class Enemy extends DescendingEnemy {
 
     /**
      * Returns a new ObjectGraphic with the appropriate text representation and image path.
-     *
      * The text representation is "👾".
      * The image path is "assets/enemy.png".
      *
-     * @return the appropriate new ObjectGraphic
+     * @return the appropriate new ObjectGraphic.
      */
     @Override
     public ObjectGraphic render() {
