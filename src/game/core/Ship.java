@@ -1,4 +1,3 @@
-// File: src/game/core/Ship.java
 package game.core;
 
 import game.ui.ObjectGraphic;
@@ -6,7 +5,7 @@ import game.ui.ObjectGraphic;
 /**
  * Represents the player's ship.
  */
-public class Ship extends Controllable implements Healable {
+public class Ship extends Controllable {
     private static final int STARTING_HEALTH = 100;
     private static final int STARTING_SCORE = 0;
     private static final int STARTING_X = 5;
@@ -70,8 +69,7 @@ public class Ship extends Controllable implements Healable {
      *
      * @param amount the amount of health restored
      */
-    @Override
-    public void heal(int amount) {
+    public void heal(int amount) {  // 不再加 @Override
         health += amount;
         if (health > STARTING_HEALTH) {
             health = STARTING_HEALTH;
