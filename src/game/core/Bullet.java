@@ -20,7 +20,7 @@ public class Bullet extends ObjectWithPosition {
     /**
      * Moves Bullet upwards by one, regardless of what the provided game tick is.
      *
-     * @param tick the given game tick
+     * @param tick the given game tick.
      */
     @Override
     public void tick(int tick) {
@@ -29,11 +29,10 @@ public class Bullet extends ObjectWithPosition {
 
     /**
      * Returns a new ObjectGraphic with the appropriate text representation and image path.
-     *
      * The text representation is "🔺".
      * The image path is "assets/bullet.png".
      *
-     * @return the appropriate new ObjectGraphic
+     * @return the appropriate new ObjectGraphic.
      */
     @Override
     public ObjectGraphic render() {
