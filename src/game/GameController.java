@@ -31,9 +31,9 @@ public class GameController {
         int tick = 0;
         while (!isPaused) {
             tick++;
-            model.updateState(tick);
+            model.updateGame(tick);                // renamed from updateState
             refreshAchievements(tick);
-            renderGame();
+            renderGame();                         
             if (model.checkGameOver()) {
                 pauseGame();
             }
@@ -41,7 +41,12 @@ public class GameController {
     }
 
     private void handlePlayerInput(String key) {
-        model.processInput(key);
+        switch (key) {
+            case "LEFT":  model.getShip().move(-1); break;
+            case "RIGHT": model.getShip().move(1);  break;
+            case "SPACE": model.fireBullet();        break;
+            default: /* ignore other keys */         break;
+        }
     }
 
     private void refreshAchievements(int tick) {
@@ -49,16 +54,16 @@ public class GameController {
     }
 
     private void renderGame() {
-        ui.render(model.getCurrentFrame());
+        ui.render(model);                     // pass model as frame
     }
 
     private void pauseGame() {
         isPaused = true;
-        ui.showGameOver(model.getScore());
+        ui.showGameOver(model.getShip().getScore());  // ship score
     }
 
     public PlayerStatsTracker getStatsTracker() {
-        return model.getStats();
+        return model.getStatsTracker();          // renamed method
     }
 
     public void showStats() {
@@ -78,5 +83,3 @@ public class GameController {
                 ach.getName(), ach.getDescription(), ach.getCurrentTier(), pct
             ));
         }
-    }
-}
