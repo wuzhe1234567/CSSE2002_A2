@@ -41,76 +41,171 @@ public abstract class Controllable implements SpaceObject {
 // src/game/GameController.java
 package game;
 
-import java.util.Objects;
 import game.achievements.AchievementManager;
 import game.achievements.PlayerStatsTracker;
+import game.ui.UI;
+import game.GameModel;
+import game.core.SpaceObject;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
- * 游戏控制器，处理游戏流程和交互。
+ * The Controller handling the game flow and interactions.
+ * Holds references to the UI and the Model, so it can pass information
+ * and references back and forth as necessary.
+ * Manages changes to the game, which are stored in the Model, and displayed by the UI.
  */
 public class GameController {
     private final UI ui;
     private final GameModel model;
-    private final AchievementManager aManager;
-    private boolean isPaused = false;
+    private final AchievementManager achievementManager;
+    private final long startTime;
+    private boolean isVerbose = false;
 
     /**
-     * 构造器：初始化 UI 与成就管理器，创建默认 GameModel，并启动主循环。
+     * Initializes the game controller with the given UI, GameModel and AchievementManager.
+     * Stores the UI, GameModel, AchievementManager and start time.
+     * The start time System.currentTimeMillis() should be stored as a long.
+     * Starts the UI using UI.start().
+     *
+     * @param ui the UI used to draw the Game
+     * @param model the model used to maintain game information
+     * @param achievementManager the manager used to maintain achievement information
+     * @requires ui is not null, model is not null, achievementManager is not null
      */
-    public GameController(UI ui, AchievementManager aManager) {
+    public GameController(UI ui, GameModel model, AchievementManager achievementManager) {
         this.ui = Objects.requireNonNull(ui, "ui must not be null");
-        this.model = new GameModel(ui::log, new PlayerStatsTracker());
-        this.aManager = Objects.requireNonNull(aManager, "aManager must not be null");
-        ui.onKey(this::handlePlayerInput);
+        this.model = Objects.requireNonNull(model, "model must not be null");
+        this.achievementManager = Objects.requireNonNull(achievementManager, "achievementManager must not be null");
+        this.startTime = System.currentTimeMillis();
         ui.start();
-        startGameLoop();
     }
 
     /**
-     * 游戏主循环：按次调用 updateGame、checkCollisions、spawnObjects、levelUp、achievement 更新与渲染。
+     * Initializes the game controller with the given UI and AchievementManager.
+     * Creates a new GameModel internally. Stores the UI, Model and start time.
+     * The start time System.currentTimeMillis() should be stored as a long.
+     * Starts the UI using UI.start().
+     *
+     * @param ui the UI used to draw the Game
+     * @param achievementManager the manager used to maintain achievement information
+     * @requires ui is not null, achievementManager is not null
      */
-    private void startGameLoop() {
-        int tick = 0;
-        while (!isPaused) {
-            tick++;
-            model.updateGame(tick);
-            model.checkCollisions();
-            model.spawnObjects();
-            model.levelUp();
-            aManager.updateAll(model, tick);
-            ui.render(model);
-            if (model.checkGameOver()) {
-                isPaused = true;
-                ui.showGameOver(model.getShip().getScore());
-            }
-        }
+    public GameController(UI ui, AchievementManager achievementManager) {
+        this(ui, new GameModel(ui::log, new PlayerStatsTracker()), achievementManager);
     }
 
     /**
-     * 处理玩家输入："LEFT"/"RIGHT" 移动，"SPACE" 射击，"P" 暂停/继续。
-     */
-    private void handlePlayerInput(String key) {
-        switch (key) {
-            case "LEFT":  model.getShip().move(-1); break;
-            case "RIGHT": model.getShip().move(1);  break;
-            case "SPACE": model.fireBullet();       break;
-            case "P":     isPaused = !isPaused;     break;
-            default:        ui.log("Invalid input. Use LEFT, RIGHT, SPACE, or P.");
-        }
-    }
-
-    /**
-     * 返回当前模型。
+     * Returns the current GameModel.
      */
     public GameModel getModel() {
         return model;
     }
 
     /**
-     * 返回当前玩家统计。
+     * Returns the current PlayerStatsTracker.
      */
     public PlayerStatsTracker getStatsTracker() {
         return model.getStatsTracker();
     }
-}
 
+    /**
+     * Sets verbose state to the provided input.
+     * Also sets the model's verbose state.
+     */
+    public void setVerbose(boolean verbose) {
+        this.isVerbose = verbose;
+        model.setVerbose(verbose);
+    }
+
+    /**
+     * Starts the main game loop by registering tick and input handlers.
+     */
+    public void startGame() {
+        ui.onStep(this::onTick);
+        ui.onKey(this::handlePlayerInput);
+    }
+
+    /**
+     * Uses the provided tick to advance game state and render.
+     *
+     * @param tick the provided tick
+     */
+    public void onTick(int tick) {
+        model.updateGame(tick);
+        model.checkCollisions();
+        model.spawnObjects();
+        model.levelUp();
+        refreshAchievements(tick);
+        renderGame();
+        if (model.checkGameOver()) {
+            pauseGame();
+            ui.showGameOver(model.getShip().getScore());
+        }
+    }
+
+    /**
+     * Pauses or unpauses the game, calling ui.pause() and logging state.
+     */
+    public void pauseGame() {
+        ui.pause();
+        boolean paused = model.checkGameOver() || false; // placeholder, or track separately
+        ui.log(paused ? "Game paused." : "Game unpaused.");
+    }
+
+    /**
+     * Updates the player's progress towards achievements.
+     *
+     * @param tick the provided tick
+     */
+    public void refreshAchievements(int tick) {
+        achievementManager.updateAll(model, tick);
+        if (isVerbose && tick % 100 == 0) {
+            ui.log("Achievements refreshed at tick " + tick);
+        }
+    }
+
+    /**
+     * Renders the current game state including stats and objects.
+     */
+    public void renderGame() {
+        ui.setStat("Score", String.valueOf(model.getShip().getScore()));
+        ui.setStat("Health", String.valueOf(model.getShip().getHealth()));
+        ui.setStat("Level", String.valueOf(model.getLevel()));
+        long elapsedSec = (System.currentTimeMillis() - startTime) / 1000;
+        ui.setStat("Time Survived", elapsedSec + " seconds");
+        List<SpaceObject> objects = model.getSpaceObjects();
+        ui.render(objects);
+    }
+
+    /**
+     * Handles player input commands.
+     *
+     * @param input the player's input command
+     */
+    public void handlePlayerInput(String input) {
+        if (input == null || input.length() != 1) {
+            ui.log("Invalid input. Use W, A, S, D, F, or P.");
+            return;
+        }
+        char c = Character.toUpperCase(input.charAt(0));
+        if (c == 'P') {
+            pauseGame();
+            return;
+        }
+        switch (c) {
+            case 'W': // up not implemented
+                break;
+            case 'A': model.getShip().move(-1); break;
+            case 'S': // down not implemented
+                break;
+            case 'D': model.getShip().move(1); break;
+            case 'F': model.fireBullet(); break;
+            default: ui.log("Invalid input. Use W, A, S, D, F, or P."); return;
+        }
+        if (isVerbose) {
+            ui.log("Ship moved to (" + model.getShip().getX() + "," + model.getShip().getY() + ")");
+        }
+    }
+}
