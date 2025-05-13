@@ -5,11 +5,11 @@ package game.core;
  */
 public abstract class ObjectWithPosition implements SpaceObject {
     /**
-     * The x coordinate of the Object.
+     * The x coordinate of the Object
      */
     protected int x;
     /**
-     * The y coordinate of the Object.
+     * The y coordinate of the Object
      */
     protected int y;
 
@@ -25,9 +25,10 @@ public abstract class ObjectWithPosition implements SpaceObject {
     }
 
     /**
-     * Returns the x coordinate of the SpaceObject, where 0 represents the left-most space with positive numbers extending to the right.
+     * Returns the x coordinate of the SpaceObject, where 0 represents the left-most space
+     * with positive numbers extending to the right.
      *
-     * @return x coordinate of the SpaceObject
+     * @return x coordinate of the SpaceObject.
      */
     @Override
     public int getX() {
@@ -35,9 +36,10 @@ public abstract class ObjectWithPosition implements SpaceObject {
     }
 
     /**
-     * Returns the y coordinate of the SpaceObject, where 0 represents the top-most space with positive numbers extending downwards.
+     * Returns the y coordinate of the SpaceObject, where 0 represents the top-most space
+     * with positive numbers extending downwards.
      *
-     * @return y coordinate of the SpaceObject
+     * @return y coordinate of the SpaceObject.
      */
     @Override
     public int getY() {
@@ -46,11 +48,13 @@ public abstract class ObjectWithPosition implements SpaceObject {
 
     /**
      * Returns a string representation of the Object.
+     * For example: "Bullet(2, 4)".
      *
-     * @return a string identifying the object's name and current position, eg. Bullet(2, 4)
+     * @return a string identifying the object's name and current position.
      */
     @Override
     public String toString() {
-        return String.format("%s(%d, %d)", getClass().getSimpleName(), x, y);
+        return String.format("%s(%d, %d)",
+                this.getClass().getSimpleName(), x, y);
     }
 }
