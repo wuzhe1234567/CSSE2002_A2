@@ -1,0 +1,57 @@
+package game.achievements;
+
+/**
+ * A concrete implementation of the Achievement interface.
+ * Progress is tracked between 0.0 and 1.0.
+ */
+public class GameAchievement implements Achievement {
+    private final String name;
+    private final String description;
+    private double progress;
+
+    public GameAchievement(String name, String description) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Name must be non-null and non-empty");
+        }
+        if (description == null || description.isEmpty()) {
+            throw new IllegalArgumentException("Description must be non-null and non-empty");
+        }
+        this.name = name;
+        this.description = description;
+        this.progress = 0.0;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public double getProgress() {
+        return progress;
+    }
+
+    @Override
+    public void setProgress(double newProgress) {
+        if (newProgress < 0.0 || newProgress > 1.0) {
+            throw new IllegalArgumentException("Progress must be between 0.0 and 1.0");
+        }
+        this.progress = newProgress;
+    }
+
+    @Override
+    public String getCurrentTier() {
+        if (progress < 0.5) {
+            return "Novice";
+        } else if (progress < 0.999) {
+            return "Expert";
+        } else {
+            return "Master";
+        }
+    }
+}
