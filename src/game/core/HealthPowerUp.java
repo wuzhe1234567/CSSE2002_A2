@@ -37,11 +37,7 @@ public class HealthPowerUp extends PowerUp {
      */
     @Override
     public void applyEffect(Ship ship) {
-        applyEffect((Healable) ship);
-    }
-
-    private void applyEffect(Healable target) {
-        target.heal(20);
+        // direct call to Ship.heal; no Healable interface needed
+        ship.heal(20);
     }
 }
-
