@@ -13,16 +13,12 @@ public class PlayerStatsTracker {
         this.startTime = System.currentTimeMillis();
     }
 
-    /**
-     * Records a shot fired by the player.
-     */
+    /** 记录一次开火 */
     public void recordShotFired() {
         shotsFired++;
     }
 
-    /**
-     * Records a successful hit on an enemy.
-     */
+    /** 记录一次命中并计为消灭一个敌人 */
     public void recordShotHit() {
         shotsHit++;
         enemiesDestroyed++;
@@ -40,9 +36,7 @@ public class PlayerStatsTracker {
         return enemiesDestroyed;
     }
 
-    /**
-     * Returns elapsed seconds since tracker creation.
-     */
+    /** 返回从游戏开始到现在经过的秒数 */
     public long getElapsedSeconds() {
         return (System.currentTimeMillis() - startTime) / 1000;
     }
