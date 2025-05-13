@@ -48,7 +48,13 @@ public class GameModel {
         this.spawnRate = START_SPAWN_RATE;
         this.ship = new Ship();
     }
-
+    
+    public void addObject(SpaceObject object) {
+        if (object == null) {
+            throw new IllegalArgumentException("object must not be null");
+        }
+        this.spaceObjects.add(object);
+    }
     // Exposed for controller
     public void updateState(int tick) {
         updateGame(tick);
