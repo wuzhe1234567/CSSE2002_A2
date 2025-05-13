@@ -1,39 +1,42 @@
 package game.achievements;
 
-public class Achievement {
-    private final String name;
-    private final String description;
-    private int currentTier;
-    private double progress;
+/**
+ * Represents a single achievement with progress tracking and tier information.
+ * The progress value of an achievement is always maintained between 0.0 (0%)
+ * and 1.0 (100%). When updating progress, the increment must be non-negative
+ * and the cumulative progress is capped at 1.0.
+ */
+public interface Achievement {
+    /**
+     * Returns the unique name of the achievement.
+     */
+    String getName();
 
-    public Achievement(String name, String description) {
-        this.name = name;
-        this.description = description;
-        this.currentTier = 0;
-        this.progress = 0.0;
-    }
+    /**
+     * Returns a description of the achievement.
+     */
+    String getDescription();
 
-    public String getName() {
-        return name;
-    }
+    /**
+     * Returns the current progress as a double between 0.0 (0%) and 1.0 (100%).
+     * Ensures: 0.0 <= getProgress() <= 1.0
+     */
+    double getProgress();
 
-    public String getDescription() {
-        return description;
-    }
+    /**
+     * Sets the progress to the specified value.
+     *
+     * @param newProgress the updated progress.
+     * @throws IllegalArgumentException if newProgress is not between 0.0 and 1.0 inclusive.
+     * Ensures: getProgress() == newProgress (capped at 1.0 and floored at 0.0).
+     */
+    void setProgress(double newProgress);
 
-    public int getCurrentTier() {
-        return currentTier;
-    }
-
-    public double getProgress() {
-        return progress;
-    }
-
-    public void updateProgress(double delta) {
-        this.progress = Math.min(1.0, this.progress + delta);
-        if (progress >= 1.0) {
-            currentTier++;
-            progress = 0.0;
-        }
-    }
+    /**
+     * Returns "Novice" if getProgress() < 0.5,
+     * "Expert" if 0.5 <= getProgress() < 0.999,
+     * and "Master" if getProgress() >= 0.999.
+     */
+    String getCurrentTier();
 }
+
