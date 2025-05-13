@@ -3,7 +3,7 @@ package game;
 import game.achievements.Achievement;
 import game.achievements.AchievementManager;
 import game.achievements.PlayerStatsTracker;
-import game.core.Direction;
+import game.Direction;                      // ← 正确的 Direction 枚举包路径
 import java.util.List;
 
 public class GameController {
