@@ -6,9 +6,11 @@ import game.core.Asteroid;
 import game.core.Enemy;
 import game.core.Bullet;
 import game.core.Ship;
+import game.core.ShieldPowerUp;
 import game.core.HealthPowerUp;
 import game.achievements.PlayerStatsTracker;
 import game.utility.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -28,7 +30,7 @@ public class GameModel {
     public static final double ENEMY_SPAWN_RATE = 0.5;
     public static final double POWER_UP_SPAWN_RATE = 0.25;
 
-    private final Random random = new Random();
+    public final Random random = new Random();
     private final List<SpaceObject> spaceObjects;
     private final Ship ship;
     private int level;
@@ -37,6 +39,12 @@ public class GameModel {
     private final PlayerStatsTracker statsTracker;
     private boolean verbose = false;
 
+    /**
+     * Models a game, storing and modifying data relevant to the game.
+     * @param logger a functional interface for passing information between classes.
+     * @param statsTracker a PlayerStatsTracker instance to record stats.
+     * @requires logger is not null, statsTracker is not null
+     */
     public GameModel(Logger logger, PlayerStatsTracker statsTracker) {
         if (logger == null || statsTracker == null) {
             throw new IllegalArgumentException("logger and statsTracker must not be null");
@@ -48,63 +56,188 @@ public class GameModel {
         this.spawnRate = START_SPAWN_RATE;
         this.ship = new Ship();
     }
-    
+
+    /**
+     * Adds a SpaceObject to the game.
+     * @param object the SpaceObject to be added. Requires object is not null.
+     */
     public void addObject(SpaceObject object) {
         if (object == null) {
             throw new IllegalArgumentException("object must not be null");
         }
-        this.spaceObjects.add(object);
-    }
-    // Exposed for controller
-    public void updateState(int tick) {
-        updateGame(tick);
+        spaceObjects.add(object);
     }
 
-    public void processInput(String key) {
-        // Example: handle fire command
-        if ("fire".equalsIgnoreCase(key)) {
-            fireBullet();
-            statsTracker.recordShotFired();
-        }
-        // TODO: other input handling
-        logger.log("Input: " + key);
-    }
-
-    public Object getCurrentFrame() {
-        // Use spaceObjects, ship, etc to build frame data
-        return new ArrayList<>(spaceObjects);
-    }
-
-    public int getScore() {
-        return ship.getScore();
-    }
-
-    public PlayerStatsTracker getStats() {
-        return statsTracker;
-    }
-
-    // Original methods below
+    /**
+     * Moves all objects and removes out-of-bounds objects.
+     * @param tick the tick value passed to objects.
+     */
     public void updateGame(int tick) {
         List<SpaceObject> toRemove = new ArrayList<>();
         for (SpaceObject obj : spaceObjects) {
             obj.tick(tick);
-            if (!isInBounds(obj)) toRemove.add(obj);
+            if (!isInBounds(obj)) {
+                toRemove.add(obj);
+            }
         }
         spaceObjects.removeAll(toRemove);
     }
 
+    /**
+     * Spawns new objects (Asteroids, Enemies, and PowerUps) at random positions.
+     * Uses this.random to make EXACTLY 6 nextInt calls and 1 nextBoolean.
+     */
     public void spawnObjects() {
-        // spawn logic
+        // 1. Asteroid spawn check
+        int roll1 = random.nextInt(100);
+        // 2. Asteroid spawn position
+        int x1 = random.nextInt(GAME_WIDTH);
+        if (roll1 < spawnRate && !collidesWithShipOrObject(x1, 0)) {
+            spaceObjects.add(new Asteroid(x1, 0));
+        }
+        // 3. Enemy spawn check
+        int roll2 = random.nextInt(100);
+        // 4. Enemy spawn position
+        int x2 = random.nextInt(GAME_WIDTH);
+        if (roll2 < spawnRate * ENEMY_SPAWN_RATE && !collidesWithShipOrObject(x2, 0)) {
+            spaceObjects.add(new Enemy(x2, 0));
+        }
+        // 5. PowerUp spawn check
+        int roll3 = random.nextInt(100);
+        // 6. PowerUp spawn position
+        int x3 = random.nextInt(GAME_WIDTH);
+        boolean spawnPU = roll3 < spawnRate * POWER_UP_SPAWN_RATE;
+        // 7. PowerUp type
+        boolean kind = random.nextBoolean();
+        if (spawnPU && !collidesWithShipOrObject(x3, 0)) {
+            spaceObjects.add(kind ? new ShieldPowerUp(x3, 0) : new HealthPowerUp(x3, 0));
+        }
     }
 
-    public void levelUp() { /* ... */ }
-    public void fireBullet() { /* ... */ }
-    public void checkCollisions() { /* ... */ }
-    public void setRandomSeed(int seed) { random.setSeed(seed); }
-    public boolean checkGameOver() { return ship.getHealth() <= 0; }
-    public static boolean isInBounds(SpaceObject spaceObject) { /* ... */ return true; }
-    public void setVerbose(boolean verbose) { this.verbose = verbose; }
-    public Ship getShip() { return ship; }
-    public List<SpaceObject> getSpaceObjects() { return new ArrayList<>(spaceObjects); }
-    public int getLevel() { return level; }
+    private boolean collidesWithShipOrObject(int x, int y) {
+        if (ship.getX() == x && ship.getY() == y) return true;
+        for (SpaceObject obj : spaceObjects) {
+            if (obj.getX() == x && obj.getY() == y) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Detects and handles collisions: Ship vs Objects, then Bullet vs Enemies/Asteroids.
+     */
+    public void checkCollisions() {
+        List<SpaceObject> toRemove = new ArrayList<>();
+        // Ship collisions
+        for (SpaceObject obj : new ArrayList<>(spaceObjects)) {
+            if (!(obj instanceof Bullet) && ship.getX() == obj.getX() && ship.getY() == obj.getY()) {
+                if (obj instanceof PowerUp) {
+                    ((PowerUp) obj).applyEffect(ship);
+                    if (verbose) logger.log("PowerUp collected: " + obj.render());
+                } else if (obj instanceof Asteroid) {
+                    ship.takeDamage(ASTEROID_DAMAGE);
+                    if (verbose) logger.log("Hit by " + obj.render() + "! Health reduced by " + ASTEROID_DAMAGE + ".");
+                } else if (obj instanceof Enemy) {
+                    ship.takeDamage(ENEMY_DAMAGE);
+                    if (verbose) logger.log("Hit by " + obj.render() + "! Health reduced by " + ENEMY_DAMAGE + ".");
+                }
+                toRemove.add(obj);
+            }
+        }
+        // Bullet collisions
+        for (SpaceObject obj : new ArrayList<>(spaceObjects)) {
+            if (obj instanceof Bullet) {
+                for (SpaceObject other : spaceObjects) {
+                    if (other instanceof Enemy && obj.getX() == other.getX() && obj.getY() == other.getY()) {
+                        toRemove.add(obj);
+                        toRemove.add(other);
+                        statsTracker.recordShotHit();
+                        break;
+                    } else if (other instanceof Asteroid && obj.getX() == other.getX() && obj.getY() == other.getY()) {
+                        toRemove.add(obj);
+                        break;
+                    }
+                }
+            }
+        }
+        spaceObjects.removeAll(toRemove);
+    }
+
+    /**
+     * Levels up game if threshold met. Logs if verbose.
+     */
+    public void levelUp() {
+        if (ship.getScore() >= level * SCORE_THRESHOLD) {
+            level++;
+            spawnRate += SPAWN_RATE_INCREASE;
+            if (verbose) {
+                logger.log("Level Up! Welcome to Level " + level + ". Spawn rate increased to " + spawnRate + "%.");
+            }
+        }
+    }
+
+    /**
+     * Fires a Bullet from the ship's position.
+     */
+    public void fireBullet() {
+        spaceObjects.add(new Bullet(ship.getX(), ship.getY()));
+    }
+
+    /**
+     * Sets random seed. Should never be called in production.
+     */
+    public void setRandomSeed(int seed) {
+        random.setSeed(seed);
+    }
+
+    /**
+     * Checks if the game is over (ship health <= 0).
+     */
+    public boolean checkGameOver() {
+        return ship.getHealth() <= 0;
+    }
+
+    /**
+     * Checks if given SpaceObject is in bounds.
+     */
+    public static boolean isInBounds(SpaceObject spaceObject) {
+        if (spaceObject == null) throw new IllegalArgumentException("spaceObject must not be null");
+        int x = spaceObject.getX();
+        int y = spaceObject.getY();
+        return x >= 0 && x < GAME_WIDTH && y >= 0 && y < GAME_HEIGHT;
+    }
+
+    /**
+     * Sets verbose logging.
+     */
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
+
+    /**
+     * Returns the current ship instance.
+     */
+    public Ship getShip() {
+        return ship;
+    }
+
+    /**
+     * Returns a copy of the list of space objects.
+     */
+    public List<SpaceObject> getSpaceObjects() {
+        return new ArrayList<>(spaceObjects);
+    }
+
+    /**
+     * Returns the current level.
+     */
+    public int getLevel() {
+        return level;
+    }
+
+    /**
+     * Returns the player stats tracker.
+     */
+    public PlayerStatsTracker getStatsTracker() {
+        return statsTracker;
+    }
 }
