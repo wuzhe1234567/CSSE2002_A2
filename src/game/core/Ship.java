@@ -1,3 +1,4 @@
+// File: src/game/core/Ship.java
 package game.core;
 
 import game.ui.ObjectGraphic;
@@ -5,11 +6,12 @@ import game.ui.ObjectGraphic;
 /**
  * Represents the player's ship.
  */
-public class Ship extends Controllable {
+public class Ship extends Controllable implements Healable {
     private static final int STARTING_HEALTH = 100;
     private static final int STARTING_SCORE = 0;
     private static final int STARTING_X = 5;
     private static final int STARTING_Y = 10;
+
     private int health;
     private int score;
 
@@ -68,10 +70,11 @@ public class Ship extends Controllable {
      *
      * @param amount the amount of health restored
      */
+    @Override
     public void heal(int amount) {
         health += amount;
-        if (health > 100) {
-            health = 100;
+        if (health > STARTING_HEALTH) {
+            health = STARTING_HEALTH;
         }
     }
 
@@ -109,6 +112,6 @@ public class Ship extends Controllable {
      */
     @Override
     public void tick(int tick) {
-      // No tick-dependent behaviour
+        // No tick-dependent behaviour
     }
 }
